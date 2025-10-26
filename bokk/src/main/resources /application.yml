@@ -1,0 +1,153 @@
+server:
+  port: 0  # Динамический порт для Eureka регистрации
+
+spring:
+  application:
+    name: booking-service
+  
+  # Конфигурация базы данных H2 (in-memory для разработки)
+  datasource:
+    url: jdbc:h2:mem:booking;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+    
+  # Конфигурация JPA и Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update  # В продакшене использовать validate или none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    open-in-view: false  # Рекомендуется для Spring Boot
+  
+  # Конфигурация H2 Console (только для разработки)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # Cloud конфигурация
+  cloud:
+    config:
+      enabled: false  # Отключено, используется прямой конфиг
+
+# Конфигурация Eureka Discovery Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 5
+    initial-instance-info-replication-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+# Конфигурация Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env  # Безопасный набор эндпойнтов
+  endpoint:
+    health:
+      show-details: when_authorized
+      show-components: when_authorized
+    info:
+      enabled: true
+
+# Конфигурация безопасности JWT
+security:
+  jwt:
+    secret: "booking-service-jwt-secret-key-minimum-32-characters-long-for-hs256-algorithm"
+    expiration-hours: 24
+
+# Конфигурация интеграции с Hotel Service
+hotel:
+  service:
+    base-url: http://hotel-service
+    timeout-ms: 5000  # Увеличен таймаут для надежности
+    max-retries: 3    # Увеличены ретраи
+    retry-backoff-ms: 500
+
+# Логирование
+logging:
+  level:
+    com.example.booking: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Swagger/OpenAPI конфигурация
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+# Профили
+---
+# Development профиль
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # Все эндпойнты для разработки
+
+logging:
+  level:
+    com.example.booking: TRACE
+    org.springframework.web: DEBUG
+
+---
+# Production профиль  
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/booking
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:booking_user}
+    password: ${DB_PASSWORD:}
+    
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.example.booking: INFO
+    org.springframework: INFO
+
+hotel:
+  service:
+    base-url: http://hotel-service-prod:8080
+    timeout-ms: 10000
+    max-retries: 5
