@@ -1,4 +1,4 @@
-package com.example.hotel.model;
+package com.example.hotel.m;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
