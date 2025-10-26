@@ -1,4 +1,4 @@
-package com.example.booking.model;
+package com.example.booking.m;
 
 import jakarta.persistence.*;
 
