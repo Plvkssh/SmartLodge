@@ -1,11 +1,11 @@
 package com.example.hotel;
 
-import com.example.hotel.model.Hotel;
-import com.example.hotel.model.Room;
-import com.example.hotel.model.RoomReservationLock;
-import com.example.hotel.repo.HotelRepository;
-import com.example.hotel.repo.RoomRepository;
-import com.example.hotel.repo.RoomReservationLockRepository;
+import com.example.hotel.m.Hotel;
+import com.example.hotel.m.Room;
+import com.example.hotel.m.RoomReservationLock;
+import com.example.hotel.repositor.HotelRepository;
+import com.example.hotel.repositor.RoomRepository;
+import com.example.hotel.repositor.RoomReservationLockRepository;
 import com.example.hotel.service.HotelService;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
